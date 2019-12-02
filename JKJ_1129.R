@@ -128,9 +128,7 @@ df <- as.data.frame(state.x77)
 df
 df2 <- df[ df$Income >= 5000 , ][ c( "Income" , "Population", "Area" ) ]
 df2
-setwd("/Users/jeong-kyujin/Documents/GitHub/Rclass") 
-# 강의실 가서는 바꿔야함
-#setwd("D:/workR")
+setwd("D:/workR")
 write.csv( df2, "rich_state.csv", row.names = F )
 #5.2
 ds <- read.csv("rich_state.csv", header = T )
