@@ -13,11 +13,15 @@
 #교육기간 19  20 16 16 18 12 14 12 16 17
 
 income <- c(121, 99, 41, 35, 40, 29, 35, 24, 50, 60)
-dur <- c(19, 20, 16, 16, 18, 12, 14, 12, 16, 17)
+period <- c(19, 20, 16, 16, 18, 12, 14, 12, 16, 17)
 
-plot(dur, income, main="교육기간과 수입의 관계", xlab="교육기간", ylab="수입")
-cor(dur, income)
-#교육기간과 수입은 강한 양의 상관관계가 있다.(교육 기간이 긴 사람일수록 수입이 높은 경향이 크다)
+tbl <- data.frame(income, period)
+plot(income~period, data=tbl)
+res <- lm(income~period, data=tbl)
+abline(res)
+
+cor(income, period)
+#교육기간과 수입은 비교적 강한 양의 상관관계가 있다.(교육 기간이 긴 사람일수록 수입이 높은 경향이 크다)
 
 
 #문2)
@@ -27,12 +31,18 @@ cor(dur, income)
 #성적 	 77.5 60 50 95 55 85 72.5 80 92.5 87.5
 #시청시간 14   10 20  7 25  9 15   13  4   21
 
-grade <- c(77.5, 60, 50, 95, 55, 85, 72.5, 80, 92.5, 87.5)
-vtime <- c(14, 10, 20,  7, 25,  9, 15, 13,  4, 21)
+score <- c(77.5, 60, 50, 95, 55, 85, 72.5, 80, 92.5, 87.5)
+tv <- c(14, 10, 20,  7, 25,  9, 15, 13,  4, 21)
 
-plot(vtime, grade, main="TV시청시간과 성적", xlab="TV시청시간", ylab="성적", pch=19, col="red" )
-cor(vtime, grade)
+tbl <- data.frame(score, tv)
+plot(score~tv, data=tbl,main="TV시청시간과 성적", xlab="TV시청시간", ylab="성적", pch=19, col="red" )
+res <- lm(score~tv, data=tbl)
+abline(res)
+
+cor(score, tv)
+
 #음의 상관관계가 있다 (TV 시청시간이 길수록 성적이 낮은 경향이 있다)
+
 
 #문3) 
 #R에서 제공하는 mtcars 데이터셋에서 mpg와 다른 변수들 간의 상관계수를
@@ -46,6 +56,9 @@ target
 pairs(target)
 cor(target[,1:7])
 # 무게와 가장 상관성이 높다. (음의 상관관계)
+
+cor(mtcars)
+cor(mtcars)[1,]
 
 #다른 방법
 cor.result <- c()
@@ -82,7 +95,7 @@ plot(year, population, main="연도별 인구수(예상)", type='l', lty=1, lwd=
 #R에서 제공하는 trees 데이터셋에 대해 다음 문제를 해결하기 위한 R 코드를 작성하시오.
 
 #(1) 나무의 지름(Girth)과 높이(Height)에 대해 산점도와 상관계수를 보이시오.
-
+class(trees)
 str(trees)
 head(trees)
 
@@ -93,9 +106,42 @@ plot(trees[,1:2], pch=1, col='red')
 cor(trees$Girth, trees$Height)
 cor(trees[,1:2])
 
+tbl <- data.frame(trees$Girth, trees$Height)
+tbl
+plot(trees$Girth, trees$Height)
+plot(tbl[,2]~tbl[,1], col='red')
+res <- lm(trees.Height~trees.Girth, data=tbl) #이걸 너무 안써봤군!!
+res
+abline(res)
+
+cor(trees$Girth, trees$Height)
+
 #(2) trees 데이터셋에 존재하는 3개 변수 간의 산점도와 상관계수를 보이시오.
 
 plot(trees)
 cor(trees)
+pairs(trees, main="Tree")
 # 나무의 지름과 부피는 강한 양의 상관관계를 갖는다
+
+
+#추가 문제 : 나무 높이를 상/중/하 그룹으로 나누고 그룹 상관 분석
+
+hist(trees$Girth)
+hist(trees$Height)
+summary(trees$Height)
+
+h.group <- c()
+
+for ( i in 1:nrow(trees) ) {
+  if (trees$Height[i] >= 80) {
+    h.group[i] <- "H"
+  } else if (trees$Height[i] <= 72) {
+    h.group[i] <- "L"
+  } else h.group[i] <- "M"
+}
+
+tbl <- data.frame(trees, h.group)
+point <- as.numeric(tbl$h.group)
+color <- c("yellow", "khaki", "darkgreen")
+pairs(tbl, pch=point, col=color[point])
 
