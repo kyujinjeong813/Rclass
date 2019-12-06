@@ -380,6 +380,7 @@ df <- data.frame( id = c( 1, 2, 3, 4, 5, 6 ),
                   science = c(50, 60, 78, 58, 65, 98) )
 df
 
+
 # filter() : 행 추출, 인수로 조건식만 주면 된다!
 df %>% filter(class == 1)
 df %>% filter(class == 2)
