@@ -12,6 +12,7 @@ df <- data.frame(state.x77)
 str(df)
 
 library(Rtsne)
+library(ggplot2)
 dup = which(duplicated(df))
 dup
 tsne <- Rtsne( df, dim = 2, perplexity = 8 )
@@ -22,9 +23,11 @@ head(df.tsne)
 ggplot(df.tsne, aes(x = X1, y = X2)) +
   geom_point(size=2)
 
+install.packages('rgl')
 library( car )
 library( rgl )
 library( mgcv )
+#맥에서는 rgl 받으려면 Xquartz가 깔려있어야 한다고
 
 tsne3 <- Rtsne( df, dim =3, perplexity = 10)
 df.tsne3 <- data.frame(tsne3$Y)
@@ -117,7 +120,6 @@ gc <- geocode(enc2utf8(names))
 #south_hall <- subset( hall, hall$lat < point[2] )
 #south_hall
 
-
 df <- data.frame( name = names, lon = gc$lon,
                   lat = gc$lat )
 df
@@ -164,26 +166,37 @@ gmap +
 
 #문7) 
 #‘2018년도 시군구별 월별 교통사고 자료’로부터 서울시의 각 구별 1년 교통사고 발생건수를 지도상에 원의 크기로 나타내시오.
-setwd("D:/Rclass")
-t_acc <- read.csv("report.csv", header = F, skip=2, stringsAsFactors = F)
-str(t_acc)
 
-t <- t_acc[(t_acc[,'V3'] == "사고건수"),][, 1:4]
-t_seoul <- t[(t[,'V1'] == "서울"),][,c(2,4)]
-t_seoul <- t_seoul[-1,]
-result <- gsub(",", "", t_seoul$V4)
-acc <- as.numeric(result)
+#setwd("D:/Rclass")
+#t_acc <- read.csv("report.csv", header = F, skip=2, stringsAsFactors = F)
+#str(t_acc)
+setwd("/Users/jeong-kyujin/Desktop/workR")
+car_acc_2018 <- read.csv("도로교통공단_시도_시군구별_월별_교통사고(2018).csv",
+                         fileEncoding = "CP949", encoding = "UTF-8",
+                         header=TRUE, sep=',', stringsAsFactors=FALSE)
+car_acc_2018 <- car_acc_2018[,1:4]
+str(car_acc_2018)
 
-names <- t_seoul$V2
-names
+library(dplyr)
+seoul_acc_2018 <- car_acc_2018 %>% 
+  filter( 시도 == "서울") %>%
+  select( 시군구, 발생건수) %>%
+  group_by( 시군구 ) %>%
+  summarise( sum = sum(발생건수))
+
+str(seoul_acc_2018)
+names <- as.vector(t(seoul_acc_2018[1]))
+str(names)
+seoul_acc <- as.vector(t(seoul_acc_2018[2]))
+str(seoul_acc)
 sgc <- geocode(enc2utf8(names))
 sgc
 df <- data.frame(name=names, lon=sgc$lon, lat=sgc$lat)
-df$acc <- acc
+df$acc <- seoul_acc
 df
 
 cen <- c(mean(df$lon), mean(df$lat))
-map <- get_google(center = cen, maptype = "roadmap", zoom=10)
+map <- get_googlemap(center = cen, maptype = "roadmap", zoom=4)
 gmap <- ggmap(map)
 gmap +
   geom_point( data = df, aes( x = lon, y = lat, size = acc ),
@@ -193,7 +206,21 @@ gmap +
 
 #문8)
 #7번과 동일한 자료를 이용하여 제주시 1년 교통사고 발생건수를 지도상에 원의 크기로 나타내시오.
-tail(t_acc)
+jeju_acc <- car_acc_2018 %>%
+  filter(시군구 == '제주시' ) %>%
+  select(시군구, 발생건수) %>%
+  group_by(시군구) %>%
+  summarise( sum = sum(발생건수))
 
-t_acc[t_acc$V1 == '제주',c(1,2,3,4)]
+jeju_acc_cnt <- as.numeric(jeju_acc[2])
+jeju_acc_cnt
 
+gc <- geocode(enc2utf8('제주시'))
+jeju_df <- data.frame( lon = gc$lon, lat = gc$lat )
+
+map <- get_googlemap(center = c(gc$lon, gc$lat), maptype = "roadmap", zoom=10)
+gmap <- ggmap(map)
+gmap +
+  geom_point( data = jeju_df, aes( x = lon, y = lat, size = jeju_acc_cnt ),
+              alpha = 0.5, col = "blue" ) +
+  scale_size_continuous( range = c(1, 5) )
