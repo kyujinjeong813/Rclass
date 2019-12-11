@@ -1,7 +1,7 @@
 #
 # 작성자 : 정규진
 # 작성일 : 2019.12.10
-# 제출일 : 2019.12.10
+# 제출일 : 2019.12.11
 #
 
 #문1)
@@ -23,7 +23,7 @@ head(df.tsne)
 ggplot(df.tsne, aes(x = X1, y = X2)) +
   geom_point(size=2)
 
-install.packages('rgl')
+#install.packages('rgl')
 library( car )
 library( rgl )
 library( mgcv )
@@ -47,7 +47,7 @@ df.tsne <- data.frame(tsne$Y)
 ggplot(df.tsne, aes(x=X1, y=X2)) +
   geom_point(size=2)
 
-tsne3 <- Rtsne3( swiss, dim=3, perplexity=10 )
+tsne3 <- Rtsne( swiss, dim=3, perplexity=10 )
 df.tsne3 <- data.frame(tsne3$Y)
 
 scatter3d( x=df.tsne3$X1, y=df.tsne3$X2, z=df.tsne3$X3)
@@ -82,7 +82,7 @@ ggmap(map)
 #(3) 강남역 근방으로 지도 크기는 640x640, 지도 유형은 roadmap, zoom은 16인 지도를 출력하시오.
 gc <- geocode( enc2utf8("강남역"))
 cen <- as.numeric(gc)
-map <- get_googlemap( cen,
+map <- get_googlemap( center = cen,
                       zoom = 16,
                       size = c(640, 640),
                       maptype = "roadmap")
@@ -167,13 +167,13 @@ gmap +
 #문7) 
 #‘2018년도 시군구별 월별 교통사고 자료’로부터 서울시의 각 구별 1년 교통사고 발생건수를 지도상에 원의 크기로 나타내시오.
 
-#setwd("D:/Rclass")
+setwd("D:/Rclass")
 #t_acc <- read.csv("report.csv", header = F, skip=2, stringsAsFactors = F)
 #str(t_acc)
-setwd("/Users/jeong-kyujin/Desktop/workR")
+#setwd("/Users/jeong-kyujin/Desktop/workR")
 car_acc_2018 <- read.csv("도로교통공단_시도_시군구별_월별_교통사고(2018).csv",
-                         fileEncoding = "CP949", encoding = "UTF-8",
                          header=TRUE, sep=',', stringsAsFactors=FALSE)
+#fileEncoding = "CP949", encoding = "UTF-8",
 car_acc_2018 <- car_acc_2018[,1:4]
 str(car_acc_2018)
 
@@ -196,7 +196,7 @@ df$acc <- seoul_acc
 df
 
 cen <- c(mean(df$lon), mean(df$lat))
-map <- get_googlemap(center = cen, maptype = "roadmap", zoom=4)
+map <- get_googlemap(center = cen, maptype = "roadmap", zoom=10)
 gmap <- ggmap(map)
 gmap +
   geom_point( data = df, aes( x = lon, y = lat, size = acc ),
@@ -218,7 +218,7 @@ jeju_acc_cnt
 gc <- geocode(enc2utf8('제주시'))
 jeju_df <- data.frame( lon = gc$lon, lat = gc$lat )
 
-map <- get_googlemap(center = c(gc$lon, gc$lat), maptype = "roadmap", zoom=10)
+map <- get_googlemap(center = c(gc$lon, gc$lat), maptype = "roadmap", zoom=14)
 gmap <- ggmap(map)
 gmap +
   geom_point( data = jeju_df, aes( x = lon, y = lat, size = jeju_acc_cnt ),
